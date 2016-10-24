@@ -47,6 +47,40 @@ bot.command :mattplease do |event|
 	nil
 end
 
+bot.command :ignore do |event, usr|
+	usr_to_ignore = bot.parse_mention(usr)
+	if bot.ignored?(usr_to_ignore)
+		bot.send_message(event.channel.id, "User " + usr + " already ignored")
+	else
+		bot.send_message(event.channel.id, "Ignoring " + usr)
+		bot.ignore_user(usr_to_ignore)
+	end
+	nil
+end
+
+# currently not working, TODO
+bot.command :ignoredusers do |event|
+	return
+	ignored_ids = bot.instance_variable_get(:@ignored_ids).to_a
+	puts ignored_ids.to_s
+	ignored_users = ignored_ids.map do |id| 
+		p id
+		Discordrb::API::User.resolve(settings['token'],id)
+	end
+	bot.send_message(event.channel.id, ignored_users.to_s)
+end
+
+bot.command :unignore do |event, usr|
+	usr_to_unignore = bot.parse_mention(usr)
+	if !bot.ignored?(usr_to_unignore)
+		bot.send_message(event.channel.id, "User " + usr + " already unignored")
+	else
+		bot.send_message(event.channel.id, "Unignoring " + usr)
+		bot.unignore_user(usr_to_unignore)
+	end
+	nil
+end
+
 bot.command(:exit, help_available: false) do |event|
   # This is a check that only allows a user with a specific ID to execute this command. Otherwise, everyone would be
   # able to shut your bot down whenever they wanted.
