@@ -3,8 +3,8 @@ require 'yaml'
 
 # parse config file
 settings = YAML.load_file('config.yml')
-if settings['token'].nil? || settings['client_id'].nil?
-	puts "'token' and 'client_id' are required!"
+if settings['token'].nil? || settings['client_id'].nil? || settings['owner'].nil?
+	puts "'token', 'client_id', and 'owner' are required!"
 	exit
 end
 
@@ -27,7 +27,7 @@ puts "This bot's invite URL is #{bot.invite_url}."
 puts 'Click on it to invite it to your server.'
 
 bot.command :admin do |event|
-	break unless event.user.id == 142827837265543168
+	break unless event.user.id == settings['owner']
 	bot.send_message(event.channel.id, 'https://discordapp.com/oauth2/authorize?client_id=240120547399303168&scope=bot&permissions=251132938')
 end
 
@@ -43,17 +43,14 @@ bot.command :mattplease do |event|
 	
 	voice_bot.play_file('data/mattplz.wav')
 	
-	#bot.send_message(event.channel.id, 'before destroy')
 	voice_bot.destroy
-	#bot.send_message(event.channel.id, 'after destroy')
 	nil
-	
 end
 
 bot.command(:exit, help_available: false) do |event|
   # This is a check that only allows a user with a specific ID to execute this command. Otherwise, everyone would be
   # able to shut your bot down whenever they wanted.
-  break unless event.user.id == 142827837265543168 # Replace number with your ID
+  break unless event.user.id == settings['owner']
 
   bot.send_message(event.channel.id, 'Bot is shutting down')
   exit
