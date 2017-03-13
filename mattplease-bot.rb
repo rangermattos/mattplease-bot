@@ -4,7 +4,7 @@ require 'yaml'
 # parse config file
 settings = YAML.load_file('config.yml')
 if settings['token'].nil? || settings['client_id'].nil? || settings['owner'].nil?
-	puts "'token', 'client_id', and 'owner' are required!"
+	puts "\'token\', \'client_id\', and \'owner\' are required!"
 	exit
 end
 
@@ -26,77 +26,82 @@ bot = Discordrb::Commands::CommandBot.new token: settings['token'], client_id: s
 puts "This bot's invite URL is #{bot.invite_url}."
 puts 'Click on it to invite it to your server.'
 
-#~bot.command :admin do |event|
-	#~break unless event.user.id == settings['owner']
-	#~bot.send_message(event.channel.id, 'https://discordapp.com/oauth2/authorize?client_id=240120547399303168&scope=bot&permissions=251132938')
-#~end
-#~
-#~bot.command :test do |event|
-	#~bot.send_message(event.channel.id, 'test')
-#~end
+define_method :play_sound do |event, file_name| # define_method used instead of def to avoid scope inaccessibility for settings
+	# only usable by owner or allowed users
+	# TODO: change to role? allow for per-command role?
+	puts "user id = #{event.user.id}"
+	next "You\'re not allowed to use that command" unless event.user.id == settings['owner'] or settings ['allowed_users'].include? event.user.id
 
-bot.command :mattplease do |event|
-	break unless event.user.id == settings['owner'] # only i can use
+	# for debug
+	puts "user confirmed"
 	channel = event.user.voice_channel
-	break unless channel # only in voice chat
-	#~channel.users.each do |x|
-		#~return if x.id == 104428065626533888 # not if ray's in voice
-	#~end
+
+	# return if not in voice chat
+	next "You\'re not in a voice channel" unless channel
+	# create voice bot
 	voice_bot = bot.voice_connect(channel)
+	# debug message
 	puts "Connected to channel: #{channel.name}"
-	
-	voice_bot.play_file('data/mattplz.wav')
-	
+
+	# play file
+	# assumed that files are in data/ directory
+	voice_bot.play_file("data/#{file_name}")
+
+	# destroy voice bot
 	voice_bot.destroy
+	# return nil
 	nil
 end
 
-#~bot.command :ignore do |event, usr|
-	#~is_admin = event.author.permission?(:administrator);
-	#~break unless is_admin
-	#~usr_to_ignore = bot.parse_mention(usr)
-	#~if bot.ignored?(usr_to_ignore)
-		#~bot.send_message(event.channel.id, "User " + usr + " already ignored")
-	#~else
-		#~bot.send_message(event.channel.id, "Ignoring " + usr)
-		#~bot.ignore_user(usr_to_ignore)
-	#~end
-	#~nil
-#~end
-#~
-#~# currently not working, TODO
-#~bot.command :ignoredusers do |event|
-	#~return
-	#~ignored_ids = bot.instance_variable_get(:@ignored_ids).to_a
-	#~puts ignored_ids.to_s
-	#~ignored_users = ignored_ids.map do |id| 
-		#~p id
-		#~Discordrb::API::User.resolve(settings['token'],id)
-	#~end
-	#~bot.send_message(event.channel.id, ignored_users.to_s)
-#~end
-#~
-#~bot.command :unignore do |event, usr|
-	#~is_admin = event.author.permission?(:administrator);
-	#~break unless is_admin
-	#~usr_to_unignore = bot.parse_mention(usr)
-	#~if !bot.ignored?(usr_to_unignore)
-		#~bot.send_message(event.channel.id, "User " + usr + " already unignored")
-	#~else
-		#~bot.send_message(event.channel.id, "Unignoring " + usr)
-		#~bot.unignore_user(usr_to_unignore)
-	#~end
-	#~nil
-#~end
+bot.command :mattplease do |event|
+	puts "!mattplease command received"
+	play_sound(event, "mattplz.wav")
+	nil
+end
 
-bot.command(:exit, help_available: false) do |event|
-  # This is a check that only allows a user with a specific ID to execute this command. Otherwise, everyone would be
-  # able to shut your bot down whenever they wanted.
-  break unless event.user.id == settings['owner']
+bot.command :deep do |event|
+	puts "!deep command received"
+	play_sound(event, "mattplz_deep.mp3")
+	nil
+end
 
-  bot.send_message(event.channel.id, 'Bot is shutting down')
-  bot.stop
-  exit
+bot.command :squirrel do |event|
+	puts "!squirrel command received"
+	play_sound(event, "mattplz_squirrel.mp3")
+	nil
+end
+
+bot.command :caaake do |event|
+	puts "!caaake command received"
+	play_sound(event, "caaake.mp3")
+	nil
+end
+
+bot.command :ianxcake do |event|
+	puts "!ianxcake command received"
+	play_sound(event, "i_love_cake.wav")
+	nil
+end
+
+bot.command :tagg do |event|
+	puts "!tagg command received"
+	play_sound(event, "tagg16_amped.wav")
+	nil
+end
+
+bot.command(:exit, help_available:false) do |event|
+	break unless event.user.id == settings['owner']
+
+	bot.send_message(event.channel.id, 'Bot is shutting down')
+	bot.stop
+	exit
+end
+
+bot.command(:reconfigure, help_available: false) do |event|
+	break unless event.user.id == settings['owner']
+
+	bot.send_message(event.channel.id, 'Reconfiguring')
+	puts "#{settings = YAML.load_file('config.yml')}"
 end
 
 # This method call has to be put at the end of your script, it is what makes the bot actually connect to Discord. If you
