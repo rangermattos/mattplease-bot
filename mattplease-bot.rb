@@ -100,6 +100,11 @@ bot.command(:table) do |event|
 	event.respond "(╯°□°）╯︵ ┻━┻"
 end
 
+bot.command(:snip) do |event|
+	next if rate_limiter.rate_limited?(:textspam, event.channel)
+	event.respond "(✿ ◕‿◕) ᓄ:scissors:╰U╯"
+end
+
 bot.command(:exit, help_available:false) do |event|
 	break unless event.user.id == settings['owner']
 
