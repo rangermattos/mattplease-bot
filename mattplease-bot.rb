@@ -92,6 +92,14 @@ bot.command(:tagg, bucket: :spam) do |event|
 	nil
 end
 
+rate_limiter = Discordrb::Commands::SimpleRateLimiter.new
+rate_limiter.bucket :textspam, delay: 10
+
+bot.command(:table) do |event|
+	next if rate_limiter.rate_limited?(:textspam, event.channel)
+	event.respond "(╯°□°）╯︵ ┻━┻"
+end
+
 bot.command(:exit, help_available:false) do |event|
 	break unless event.user.id == settings['owner']
 
