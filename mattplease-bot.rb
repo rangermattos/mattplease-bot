@@ -97,11 +97,13 @@ rate_limiter.bucket :textspam, delay: 10
 
 bot.command(:table) do |event|
 	next if rate_limiter.rate_limited?(:textspam, event.channel)
+	puts "!table command received, user = #{event.user.id} in channel #{event.channel.id}"
 	event.respond "(╯°□°）╯︵ ┻━┻"
 end
 
 bot.command(:snip) do |event|
 	next if rate_limiter.rate_limited?(:textspam, event.channel)
+	puts "!snip command received, user = #{event.user.id} in channel #{event.channel.id}"
 	event.respond "(✿ ◕‿◕) ᓄ:scissors:╰U╯"
 end
 
