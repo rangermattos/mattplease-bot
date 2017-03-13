@@ -26,6 +26,9 @@ bot = Discordrb::Commands::CommandBot.new token: settings['token'], client_id: s
 puts "This bot's invite URL is #{bot.invite_url}."
 puts 'Click on it to invite it to your server.'
 
+# limit spam commands to 3 per 60 seconds, 10 second delay between
+bot.bucket :spam, limit: 3, time_span: 60, delay: 10
+
 define_method :play_sound do |event, file_name| # define_method used instead of def to avoid scope inaccessibility for settings
 	# only usable by owner or allowed users
 	# TODO: change to role? allow for per-command role?
@@ -53,37 +56,37 @@ define_method :play_sound do |event, file_name| # define_method used instead of 
 	nil
 end
 
-bot.command :mattplease do |event|
+bot.command (:mattplease, bucket: :spam) do |event|
 	puts "!mattplease command received"
 	play_sound(event, "mattplz.wav")
 	nil
 end
 
-bot.command :deep do |event|
+bot.command (:deep, bucket: :spam) do |event|
 	puts "!deep command received"
 	play_sound(event, "mattplz_deep.mp3")
 	nil
 end
 
-bot.command :squirrel do |event|
+bot.command (:squirrel, bucket: :spam) do |event|
 	puts "!squirrel command received"
 	play_sound(event, "mattplz_squirrel.mp3")
 	nil
 end
 
-bot.command :caaake do |event|
+bot.command (:caaake, bucket: :spam) do |event|
 	puts "!caaake command received"
 	play_sound(event, "caaake.mp3")
 	nil
 end
 
-bot.command :ianxcake do |event|
+bot.command (:ianxcake, bucket: :spam) do |event|
 	puts "!ianxcake command received"
 	play_sound(event, "i_love_cake.wav")
 	nil
 end
 
-bot.command :tagg do |event|
+bot.command (:tagg, bucket: :spam) do |event|
 	puts "!tagg command received"
 	play_sound(event, "tagg16_amped.wav")
 	nil
